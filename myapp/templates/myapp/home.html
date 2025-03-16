@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Nhập dữ liệu và chọn phép tính</h1>
-    <form method="post" enctype="multipart/form-data">
+    <form method="Post" enctype="multipart/form-data">
         {% csrf_token %}
         
         <label>TS1: </label> {{ form.ts1 }}
@@ -17,11 +17,14 @@
         <label>TS4: </label> {{ form.ts4 }}
         
         <label>Loại phép tính: </label> {{ form.operation }}
-        
+        {% csrf_token %}
         <button type="submit">Run</button>
         <button type="button" onclick="predict()">Predict</button>
         <button type="button" onclick="resetForm()">Reset</button>
-        
+          <!-- Hiển thị kết quả -->
+    {% if result is not None %}
+    <h2>Kết quả của phép tính là: {{ result }}</h2>
+{% endif %}
     <h3>Chọn file ảnh</h3>
     <input type="file" name="image">
 
@@ -36,18 +39,50 @@
     
     <script>
         function resetForm() {
-            document.querySelector("form").reset();
+            // Lưu lại CSRF token trước khi reset
+            let csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+        
+            // Xóa giá trị của tất cả các ô input, trừ file input và CSRF token
+            document.querySelectorAll("input").forEach(input => {
+                if (input.type !== "file" && input.name !== "csrfmiddlewaretoken") {
+                    input.value = "";
+                }
+            });
+        
+            // Reset dropdown về giá trị đầu tiên
+            document.querySelectorAll("select").forEach(select => {
+                select.selectedIndex = 0;
+            });
+        
+            // Xóa kết quả hiển thị
+            let resultElement = document.querySelector("h2");
+            if (resultElement) {
+                resultElement.innerText = "";
+            }
+        
+            // Xóa ảnh đã tải lên (nếu có)
+            let imageElement = document.querySelector("img");
+            if (imageElement) {
+                imageElement.remove();
+            }
+        
+            // Xóa biểu đồ nếu cần
+            let lossChart = document.getElementById("lossChart");
+            let accuracyChart = document.getElementById("accuracyChart");
+            if (lossChart) lossChart.remove();
+            if (accuracyChart) accuracyChart.remove();
+        
+            // Khôi phục CSRF token
+            document.querySelector("input[name='csrfmiddlewaretoken']").value = csrfToken;
         }
+        
         
         function predict() {
             alert("Predict function chưa được triển khai!");
         }
     </script>
     
-     <!-- Hiển thị kết quả -->
-    {% if result is not None %}
-    <h2>Kết quả của phép tính là: {{ result }}</h2>
-{% endif %}
+   
 
    
     <h2>Biểu đồ</h2>

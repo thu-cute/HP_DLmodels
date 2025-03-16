@@ -4,10 +4,12 @@ from .models import Calculation
 from django.core.files.storage import FileSystemStorage  # Thêm để lưu file ảnh
 
 def home_view(request):
+    
     result = None
     image_url = None  # Biến lưu đường dẫn ảnh
 
     form = CalculationForm(request.POST or None)
+
 
     if request.method == "POST" and form.is_valid():
         ts1 = form.cleaned_data['ts1']
@@ -22,7 +24,8 @@ def home_view(request):
             result = ts1 - ts2 - ts3 - ts4
         elif operation == "Nhân":
             result = ts1 * ts2 * ts3 * ts4
-
+        else:
+            result = None  # Tránh chia cho 0
         
 
         # Lưu kết quả vào database
@@ -37,8 +40,9 @@ def home_view(request):
             filename = fs.save(image.name, image)
             image_url = fs.url(filename)  # Lấy đường dẫn ảnh
             
+            
     return render(request, 'myapp/home.html', {'form': form, 'result': result,  'image_url': image_url})
-
+  
 from django.http import JsonResponse
 import random
 
@@ -61,3 +65,8 @@ def get_chart_data(request):
     }
     return JsonResponse(data)
 
+def my_view(request):
+    if request.method == "POST":
+        # Xử lý dữ liệu
+        pass
+    return render(request, "home.html")
