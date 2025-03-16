@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django App</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Nhập dữ liệu và chọn phép tính</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <label>TS1: </label> {{ form.ts1 }}
+        <label>TS2: </label> {{ form.ts2 }}
+        <label>TS3: </label> {{ form.ts3 }}
+        <label>TS4: </label> {{ form.ts4 }}
+        
+        <label>Loại phép tính: </label> {{ form.operation }}
+        
+        <button type="submit">Run</button>
+        <button type="button" onclick="predict()">Predict</button>
+        <button type="button" onclick="resetForm()">Reset</button>
+        
+    <h3>Chọn file ảnh</h3>
+    <input type="file" name="image">
+
+    {% if image_url %}
+        <h3>Ảnh đã chọn:</h3>
+        <img src="{{ image_url }}" alt="Ảnh tải lên" style="max-width: 300px;">
+    {% endif %}
+    </form>
+    
+   
+  
+    
+    <script>
+        function resetForm() {
+            document.querySelector("form").reset();
+        }
+        
+        function predict() {
+            alert("Predict function chưa được triển khai!");
+        }
+    </script>
+    
+     <!-- Hiển thị kết quả -->
+    {% if result is not None %}
+    <h2>Kết quả của phép tính là: {{ result }}</h2>
+{% endif %}
+
+   
+    <h2>Biểu đồ</h2>
+    <canvas id="chart1"></canvas>
+    <canvas id="chart2"></canvas>
+
+    <!-- Thêm Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<canvas id="lossChart"></canvas>
+<canvas id="accuracyChart"></canvas>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('/chart-data/')
+        .then(response => response.json())
+        .then(data => {
+            const ctx1 = document.getElementById('lossChart').getContext('2d');
+            const ctx2 = document.getElementById('accuracyChart').getContext('2d');
+
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: data.epochs,
+                    datasets: [
+                        {
+                            label: 'Train Loss',
+                            data: data.train_loss,
+                            borderColor: 'blue',
+                            fill: false
+                        },
+                        {
+                            label: 'Test Loss',
+                            data: data.test_loss,
+                            borderColor: 'orange',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Model Loss'
+                        }
+                    }
+                }
+            });
+
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: data.epochs,
+                    datasets: [
+                        {
+                            label: 'Train Accuracy',
+                            data: data.train_accuracy,
+                            borderColor: 'blue',
+                            fill: false
+                        },
+                        {
+                            label: 'Test Accuracy',
+                            data: data.test_accuracy,
+                            borderColor: 'orange',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Model Accuracy'
+                        }
+                    }
+                }
+            });
+        });
+});
+</script>
+
+
+</body>
+
+</html>
