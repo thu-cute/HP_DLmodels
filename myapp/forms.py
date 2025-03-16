@@ -1,8 +1,6 @@
 from django import forms
 from .models import Calculation
 
-
-
 class CalculationForm(forms.Form):
     ts1 = forms.FloatField(label="TS1")
     ts2 = forms.FloatField(label="TS2")

@@ -86,24 +86,34 @@
 
    
     <h2>Biểu đồ</h2>
-    <canvas id="chart1"></canvas>
-    <canvas id="chart2"></canvas>
+<div style="width: 80%; margin: auto;">
+    <canvas id="lossChart"></canvas>
+</div>
+<div style="width: 80%; margin: auto;">
+    <canvas id="accuracyChart"></canvas>
+</div>
 
-    <!-- Thêm Chart.js -->
+<!-- Thêm Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<canvas id="lossChart"></canvas>
-<canvas id="accuracyChart"></canvas>
-
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     fetch('/chart-data/')
         .then(response => response.json())
         .then(data => {
+            if (!data || !data.epochs || !data.train_loss || !data.test_loss || !data.train_accuracy || !data.test_accuracy) {
+                console.error("Dữ liệu trả về không đúng định dạng:", data);
+                alert("Lỗi tải dữ liệu biểu đồ.");
+                return;
+            }
+
             const ctx1 = document.getElementById('lossChart').getContext('2d');
             const ctx2 = document.getElementById('accuracyChart').getContext('2d');
 
-            new Chart(ctx1, {
+            if (window.lossChartInstance) window.lossChartInstance.destroy();
+            if (window.accuracyChartInstance) window.accuracyChartInstance.destroy();
+
+            window.lossChartInstance = new Chart(ctx1, {
                 type: 'line',
                 data: {
                     labels: data.epochs,
@@ -112,28 +122,45 @@ document.addEventListener("DOMContentLoaded", function() {
                             label: 'Train Loss',
                             data: data.train_loss,
                             borderColor: 'blue',
+                            borderWidth: 2,
                             fill: false
                         },
                         {
                             label: 'Test Loss',
                             data: data.test_loss,
                             borderColor: 'orange',
+                            borderWidth: 2,
                             fill: false
                         }
                     ]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: {
                             display: true,
                             text: 'Model Loss'
                         }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Epochs'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Loss Value'
+                            }
+                        }
                     }
                 }
             });
 
-            new Chart(ctx2, {
+            window.accuracyChartInstance = new Chart(ctx2, {
                 type: 'line',
                 data: {
                     labels: data.epochs,
@@ -142,29 +169,61 @@ document.addEventListener("DOMContentLoaded", function() {
                             label: 'Train Accuracy',
                             data: data.train_accuracy,
                             borderColor: 'blue',
+                            borderWidth: 2,
                             fill: false
                         },
                         {
                             label: 'Test Accuracy',
                             data: data.test_accuracy,
                             borderColor: 'orange',
+                            borderWidth: 2,
                             fill: false
                         }
                     ]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: {
                             display: true,
                             text: 'Model Accuracy'
                         }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Epochs'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Accuracy (%)'
+                            },
+                            min: 0,
+                            max: 100
+                        }
                     }
                 }
             });
+        })
+        .catch(error => {
+            console.error("Lỗi khi tải dữ liệu biểu đồ:", error);
+            alert("Không thể tải dữ liệu biểu đồ.");
         });
 });
 </script>
+
+<style>
+canvas {
+    max-width: 100%;
+    height: 400px;
+}
+</style>
+
+    
 
 
 </body>
