@@ -16,3 +16,19 @@ HyperparameterDLmodels là một website đánh giá ảnh hưởng của các s
 - Python 3.x
 - Django
 - Thư viện máy học: Chart.js
+## Hướng dẫn cài đặt
+### Chuẩn bị môi trường:
+Cài đặt Django và các thư viện cần thiết. Mở terminal/cmd và chạy:
+```
+pip install django matplotlib pillow
+```
+## Truy cập HyperparameterDLmodels
+Sau khi cài đặt xong, bạn có thể khởi chạy Django:
+```
+python manage.py runserver
+```
+Khi hoàn tất các bước trên, bạn có thể mở trình duyệt và truy cập:
+```
+http://127.0.0.1:8000/
+```
+
